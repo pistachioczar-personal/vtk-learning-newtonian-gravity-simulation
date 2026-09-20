@@ -1,0 +1,64 @@
+from Bodies import Body
+from typing import Final
+from vtkmodules.vtkCommonDataModel import vtkVector3d
+
+class NewtonianBody(Body):
+    def __init__(self, position, radius, velocity, gravity, mass):
+        super().__init__(position, radius)
+        self.__mass = mass
+        self.__velocity = velocity
+        self.__gravity = gravity
+        self.GRAVITATIONAL_CONSTANT: Final = 0.000295913120346
+
+
+    #Getters and Setters
+    def setMass(self, mass):
+        if not isinstance(mass, (int, float)):
+            raise TypeError("Mass must be a number")
+        if mass <= 0:
+            raise ValueError("Mass must be positive")
+        self.__mass = mass
+
+    def setVelocity(self, velocity):
+        if not isinstance(velocity, vtkVector3d):
+            raise TypeError("Velocity must be a vtkVector3d object")
+        self.__velocity = velocity
+
+    def getMass(self):
+        return self.__mass
+
+    def getVelocity(self):
+        return self.__velocity
+
+    def setGravity(self, bodies: list):
+        currentVector = vtkVector3d(0, 0, 0)
+
+        for body in bodies:
+            if body is not self:
+                unitNewVector = (body.get_position() - self.__position).Normalized()
+                distance = (body.get_position() - self.__position).Norm()
+                newVector = unitNewVector * (-self.GRAVITATIONAL_CONSTANT * (body.getMass() * self.__mass) / (distance ** 2))
+                currentVector += newVector
+
+        self.__gravity = currentVector
+
+    def getGravity(self):
+        return self.__gravity
+
+    #Methods
+
+    
+    def getMyKinetic(self):
+        return 0.5 * self.__mass * (self.__velocity.Norm() ** 2)
+
+    def getMyPotential(self, bodies: list):
+        potential_energy = 0
+        for body in bodies:
+            if body is not self:
+                distance = (self.__position - body.get_position()).Norm()
+                potential_energy -= (self.GRAVITATIONAL_CONSTANT * self.__mass * body.get_mass()) / distance
+        return potential_energy
+
+    
+    
+    
