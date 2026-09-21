@@ -59,6 +59,28 @@ class NewtonianBody(Body):
                 potential_energy -= (self.GRAVITATIONAL_CONSTANT * self.__mass * body.get_mass()) / distance
         return potential_energy
 
+    @staticmethod
+    def getSystemKinetic(newtonianBodies: list):
+        total_kinetic_energy = 0
+        for body in newtonianBodies:
+            if isinstance(body, NewtonianBody):
+                total_kinetic_energy += body.getMyKinetic()
+        return total_kinetic_energy
+
+    @staticmethod
+    def getSystemPotential(newtonianBodies: list, self):
+        total_potential_energy = 0
+        for i in range(len(newtonianBodies)):
+            for j in range(i + 1, len(newtonianBodies)):
+                if isinstance(newtonianBodies[i], NewtonianBody) and isinstance(newtonianBodies[j], NewtonianBody):
+                    distance = (newtonianBodies[i].get_position() - newtonianBodies[j].get_position()).Norm()
+                    total_potential_energy -= (self.GRAVITATIONAL_CONSTANT * newtonianBodies[i].get_mass() * newtonianBodies[j].get_mass()) / distance
+        return total_potential_energy
+
+    @staticmethod
+    def getSystemEnergy(self, newtonianBodies: list):
+        return self.getSystemKinetic(newtonianBodies) + self.getSystemPotential(newtonianBodies, self)
+
     
     
     
