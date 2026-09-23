@@ -27,7 +27,7 @@ class Body:
         return self.__radius
 
     #Methods
-    def distanceSquared(self, other_body):
+    def distance_squared(self, other_body):
         if not isinstance(other_body, Body):
             raise TypeError("Argument must be a Body object")
         distance_squared = (self.__position.GetX() - other_body.get_position().GetX()) ** 2 + \
@@ -38,14 +38,14 @@ class Body:
     def distance(self, other_body):
         if not isinstance(other_body, Body):
             raise TypeError("Argument must be a Body object")
-        return sqrt(self.distanceSquared(other_body))
+        return sqrt(self.distance_squared(other_body))
 
-    def doesIntersect(self, other_body):
+    def does_intersect(self, other_body):
         if not isinstance(other_body, Body):
             raise TypeError("Argument must be a Body object")
-        return self.distanceSquared(other_body) < (self.__radius + other_body.get_radius()) ** 2
+        return self.distance_squared(other_body) < (self.__radius + other_body.get_radius()) ** 2
 
-    def isInBounds(self, bounds):
+    def is_in_bounds(self, bounds):
         if not isinstance(bounds, (list, tuple)) or len(bounds) != 6:
             raise TypeError("Bounds must be a list or tuple of length 6")
         x_min, x_max, y_min, y_max, z_min, z_max = bounds
@@ -67,10 +67,10 @@ if __name__ == "__main__":
     radius2 = 1
     body2 = Body(position2, radius2)
 
-    print("Distance squared:", body1.distanceSquared(body2))
+    print("Distance squared:", body1.distance_squared(body2))
     print("Distance:", body1.distance(body2))
-    print("Do they intersect?", body1.doesIntersect(body2))
+    print("Do they intersect?", body1.does_intersect(body2))
 
     bounds = [-2, 2, -2, 2, -2, 2]
-    print("Is body1 in bounds?", body1.isInBounds(bounds))
-    print("Is body2 in bounds?", body2.isInBounds(bounds))
+    print("Is body1 in bounds?", body1.is_in_bounds(bounds))
+    print("Is body2 in bounds?", body2.is_in_bounds(bounds))

@@ -1,4 +1,4 @@
-from Bodies import Body
+import Body
 from typing import Final
 from vtkmodules.vtkCommonDataModel import vtkVector3d
 
@@ -12,46 +12,44 @@ class NewtonianBody(Body):
 
 
     #Getters and Setters
-    def setMass(self, mass):
+    def set_mass(self, mass):
         if not isinstance(mass, (int, float)):
             raise TypeError("Mass must be a number")
         if mass <= 0:
             raise ValueError("Mass must be positive")
         self.__mass = mass
 
-    def setVelocity(self, velocity):
+    def set_velocity(self, velocity):
         if not isinstance(velocity, vtkVector3d):
             raise TypeError("Velocity must be a vtkVector3d object")
         self.__velocity = velocity
 
-    def getMass(self):
+    def get_mass(self):
         return self.__mass
 
-    def getVelocity(self):
+    def get_velocity(self):
         return self.__velocity
 
-    def setGravity(self, bodies: list):
+    def set_gravity(self, bodies: list):
         currentVector = vtkVector3d(0, 0, 0)
 
         for body in bodies:
             if body is not self:
                 unitNewVector = (body.get_position() - self.__position).Normalized()
                 distance = (body.get_position() - self.__position).Norm()
-                newVector = unitNewVector * (-self.GRAVITATIONAL_CONSTANT * (body.getMass() * self.__mass) / (distance ** 2))
+                newVector = unitNewVector * (-self.GRAVITATIONAL_CONSTANT * (body.get_mass() * self.__mass) / (distance ** 2))
                 currentVector += newVector
 
         self.__gravity = currentVector
 
-    def getGravity(self):
+    def get_gravity(self):
         return self.__gravity
 
     #Methods
-
-    
-    def getMyKinetic(self):
+    def get_my_kinetic(self):
         return 0.5 * self.__mass * (self.__velocity.Norm() ** 2)
 
-    def getMyPotential(self, bodies: list):
+    def get_my_potential(self, bodies: list):
         potential_energy = 0
         for body in bodies:
             if body is not self:
@@ -60,15 +58,15 @@ class NewtonianBody(Body):
         return potential_energy
 
     @staticmethod
-    def getSystemKinetic(newtonianBodies: list):
+    def get_system_kinetic(newtonianBodies: list):
         total_kinetic_energy = 0
         for body in newtonianBodies:
             if isinstance(body, NewtonianBody):
-                total_kinetic_energy += body.getMyKinetic()
+                total_kinetic_energy += body.get_my_kinetic()
         return total_kinetic_energy
 
     @staticmethod
-    def getSystemPotential(newtonianBodies: list, self):
+    def get_system_potential(newtonianBodies: list, self):
         total_potential_energy = 0
         for i in range(len(newtonianBodies)):
             for j in range(i + 1, len(newtonianBodies)):
@@ -78,8 +76,8 @@ class NewtonianBody(Body):
         return total_potential_energy
 
     @staticmethod
-    def getSystemEnergy(self, newtonianBodies: list):
-        return self.getSystemKinetic(newtonianBodies) + self.getSystemPotential(newtonianBodies, self)
+    def get_system_energy(self, newtonianBodies: list):
+        return self.get_system_kinetic(newtonianBodies) + self.get_system_potential(newtonianBodies, self)
 
     
     
