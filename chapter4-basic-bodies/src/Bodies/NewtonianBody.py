@@ -1,14 +1,22 @@
-import Body
+from .Body import Body
 from typing import Final
 from vtkmodules.vtkCommonDataModel import vtkVector3d
 
+#importing from support
+import sys
+sys.path.append('../support')
+from support import vector_math as vm
+
+
 class NewtonianBody(Body):
-    def __init__(self, position, radius, velocity, gravity, mass):
+
+    GRAVITATIONAL_CONSTANT: Final = 0.000295913120346
+
+    def __init__(self, position: vtkVector3d, radius, velocity: vtkVector3d, gravity: vtkVector3d, mass):
         super().__init__(position, radius)
         self.__mass = mass
         self.__velocity = velocity
         self.__gravity = gravity
-        self.GRAVITATIONAL_CONSTANT: Final = 0.000295913120346
 
 
     #Getters and Setters
@@ -35,10 +43,13 @@ class NewtonianBody(Body):
 
         for body in bodies:
             if body is not self:
-                unitNewVector = (body.get_position() - self.__position).Normalized()
-                distance = (body.get_position() - self.__position).Norm()
-                newVector = unitNewVector * (-self.GRAVITATIONAL_CONSTANT * (body.get_mass() * self.__mass) / (distance ** 2))
-                currentVector += newVector
+
+                dist_vect = vtkVector3d(body.get_position()[0] - self._position[0], body.get_position()[1] - self._position[1], body.get_position()[2] - self._position[2])
+                unit_new_vector = dist_vect.Normalized()
+                distance = dist_vect.Norm()
+                scale_factor = self.GRAVITATIONAL_CONSTANT * (body.get_mass() * self.__mass) / (distance ** 2)
+                new_vector = vtkVector3d(scale_factor * unit_new_vector[0], scale_factor * unit_new_vector[1], scale_factor * unit_new_vector[2])
+                currentVector = vtkVector3d(currentVector[0] + new_vector[0], currentVector[1] + new_vector[1], currentVector[2] + new_vector[2])
 
         self.__gravity = currentVector
 
@@ -53,7 +64,7 @@ class NewtonianBody(Body):
         potential_energy = 0
         for body in bodies:
             if body is not self:
-                distance = (self.__position - body.get_position()).Norm()
+                distance = (self._position - body.get_position()).Norm()
                 potential_energy -= (self.GRAVITATIONAL_CONSTANT * self.__mass * body.get_mass()) / distance
         return potential_energy
 
@@ -66,19 +77,16 @@ class NewtonianBody(Body):
         return total_kinetic_energy
 
     @staticmethod
-    def get_system_potential(newtonianBodies: list, self):
+    def get_system_potential(newtonianBodies: list):
         total_potential_energy = 0
         for i in range(len(newtonianBodies)):
             for j in range(i + 1, len(newtonianBodies)):
                 if isinstance(newtonianBodies[i], NewtonianBody) and isinstance(newtonianBodies[j], NewtonianBody):
-                    distance = (newtonianBodies[i].get_position() - newtonianBodies[j].get_position()).Norm()
-                    total_potential_energy -= (self.GRAVITATIONAL_CONSTANT * newtonianBodies[i].get_mass() * newtonianBodies[j].get_mass()) / distance
+                    distance = (vm.add_vecs(newtonianBodies[i].get_position(), vm.scale_vec(-1, newtonianBodies[j].get_position()))).Norm()
+                    total_potential_energy -= (NewtonianBody.GRAVITATIONAL_CONSTANT * newtonianBodies[i].get_mass() * newtonianBodies[j].get_mass()) / distance
         return total_potential_energy
 
     @staticmethod
-    def get_system_energy(self, newtonianBodies: list):
-        return self.get_system_kinetic(newtonianBodies) + self.get_system_potential(newtonianBodies, self)
+    def get_system_energy(newtonianBodies: list):
+        return NewtonianBody.get_system_kinetic(newtonianBodies) + NewtonianBody.get_system_potential(newtonianBodies)
 
-    
-    
-    
