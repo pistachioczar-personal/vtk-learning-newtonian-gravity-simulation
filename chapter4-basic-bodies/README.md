@@ -27,6 +27,9 @@ pip install vtk numpy
 python src/main.py
 ```
 
+**4. Changing body amounts and bounds** <br>
+To change the bounds or number of bodies go into the main folder and change the main function call at the bottom of the file.
+
 ### System Defaults
 
 - Unit of Mass = 1 solar mass (1.988,416 \* 10^30 kg)
@@ -46,6 +49,7 @@ The math works, but the code right now is pretty brute-force and leaves a lot of
 
 - Setup Bottleneck: Just randomizing the bodies' starting locations without them overlapping takes way too long. The more bodies you cram into the bounding box, the worse the delay gets.
 - Gravity Calculations (O(N^2)): Calculating the gravity between every single pair of bodies using nested Python loops is a massive performance hit.
+- Will change the gravity vector in future projects to show the accelleration from gravity instead of the force itself.
 
 **Next Steps for Optimization:**
 
@@ -68,3 +72,14 @@ The math works, but the code right now is pretty brute-force and leaves a lot of
 | 1         | 0.295          | 0.295        | 10.119        | `main()`                 | `src/main.py:37`                 |
 | 2,997,000 | 0.268          | 0.000        | 0.268         | `get_mass()`             | `src/bodies/NewtonianBody.py:35` |
 | 3,194,679 | 0.234          | 0.000        | 0.234         | `isinstance()`           | `[built-in]`                     |
+
+## Photos of program
+
+**Shows a system with 2 bodies in the bounds 20x20x20**
+![2 bodies 20^3 bounds](docs/program_photos/bodies_2-bouds_20.png)
+
+**Shows a system with 30 bodies in the bounds 20x20x20**
+![30 bodies 20^3 bounds](docs/program_photos/bodies_30-bounds_20.png)
+
+**Shows a system with 5 bodies in the bounds 20x20x10**
+![5 bodies 20x20x10 bounds](docs/program_photos/bodies_5-bouds_20x20x10.png)

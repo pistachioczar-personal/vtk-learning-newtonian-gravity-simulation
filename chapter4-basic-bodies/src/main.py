@@ -34,7 +34,9 @@ from vtkmodules.vtkFiltersCore import vtkGlyph3D
 from vtkmodules.vtkFiltersModeling import vtkOutlineFilter
 
 
-def main(number_of_bodies, bounds: list):
+def main(number_of_bodies, lengths: list):
+
+    bounds = (0, lengths[0], 0, lengths[1], 0, lengths[2])
 
     #Setting visualization objects
     renderer = vtkRenderer()
@@ -273,12 +275,13 @@ def randomize_bodies(bodies, bounds):
         body.set_mass(mass)
 
         #Handling randomized velocity
-        vel = np.random.rand(3)
+        vel = np.random.randn(3)
         vel = vel / np.linalg.norm(vel) * rand.uniform(0, 0.05)
         body.set_velocity(vtkVector3d(*vel))
+        print(f"Velocity: {body.get_velocity()}")
 
     for body in bodies:
         body.set_gravity(bodies)
 
 if __name__ == "__main__":
-    main(100, [0,20,0,20,0,20])
+    main(5, [20, 20, 10])
